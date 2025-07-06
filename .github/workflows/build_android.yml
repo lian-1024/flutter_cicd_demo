@@ -53,21 +53,25 @@ jobs:
           channel: 'stable' # 或者 'beta', 'dev'
           # flutter-version: '3.16.0' # 可以指定具体的版本
 
-      # 6. 安装 Flutter 依赖
+      # 6. 清理项目
+      - name: Clean project
+        run: flutter clean
+
+      # 7. 安装 Flutter 依赖
       - name: Install dependencies
         run: flutter pub get
 
-      # (可选) 7. 运行代码分析和测试
+      # (可选) 8. 运行代码分析和测试
       - name: Analyze project
         run: flutter analyze
       - name: Run tests
         run: flutter test
 
-      # 8. 构建 Release 版本的 APK
+      # 9. 构建 Release 版本的 APK
       - name: Build APK
         run: flutter build apk --release
 
-      # 9. 上传构建产物 (APK)
+      # 10. 上传构建产物 (APK)
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
