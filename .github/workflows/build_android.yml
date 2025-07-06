@@ -1,0 +1,69 @@
+name: Build Flutter APK
+
+# 触发工作流的事件
+on:
+  push:
+    branches:
+      - main  # 当代码推送到 main 分支时触发
+  pull_request:
+    branches:
+      - main  # 当有 Pull Request 指向 main 分支时触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # 使用最新的 Ubuntu 虚拟机环境
+
+    steps:
+      # 1. 拉取代码
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. 解码并创建 Keystore 文件
+      # 从 GitHub Secrets 中获取 Base64 字符串，解码后写入到 android/upload-keystore.jks
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
+
+      # 3. 创建 key.properties 文件
+      # 从 GitHub Secrets 中获取密码等信息，写入到 android/key.properties
+      - name: Create key.properties
+        run: |
+          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+          echo "storeFile=upload-keystore.jks" >> android/key.properties
+      
+      # 4. 设置 Java 环境 (Android 构建需要)
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '11' # Flutter 目前推荐的 Java 版本
+
+      # 5. 设置 Flutter 环境
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable' # 或者 'beta', 'dev'
+          # flutter-version: '3.16.0' # 可以指定具体的版本
+
+      # 6. 安装 Flutter 依赖
+      - name: Install dependencies
+        run: flutter pub get
+
+      # (可选) 7. 运行代码分析和测试
+      - name: Analyze project
+        run: flutter analyze
+      - name: Run tests
+        run: flutter test
+
+      # 8. 构建 Release 版本的 APK
+      - name: Build APK
+        run: flutter build apk --release
+
+      # 9. 上传构建产物 (APK)
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-apk # 上传后的产物名称
+          path: build/app/outputs/flutter-apk/app-release.apk # APK 生成的路径
