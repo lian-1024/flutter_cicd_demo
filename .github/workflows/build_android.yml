@@ -16,7 +16,7 @@ jobs:
     steps:
       # 1. 拉取代码
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       # 2. 解码并创建 Keystore 文件
       # 从 GitHub Secrets 中获取 Base64 字符串，解码后写入到 android/upload-keystore.jks
@@ -63,7 +63,7 @@ jobs:
 
       # 9. 上传构建产物 (APK)
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: release-apk # 上传后的产物名称
           path: build/app/outputs/flutter-apk/app-release.apk # APK 生成的路径
