@@ -50,8 +50,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          # channel: 'stable' # 或者 'beta', 'dev'
-          flutter-version: '3.16.0' # 可以指定具体的版本
+          channel: 'stable' # 或者 'beta', 'dev'
+          # flutter-version: '3.16.0' # 可以指定具体的版本
 
       # 6. 安装 Flutter 依赖
       - name: Install dependencies
